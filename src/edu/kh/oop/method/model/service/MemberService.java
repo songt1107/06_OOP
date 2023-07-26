@@ -174,7 +174,7 @@ public class MemberService {
 		// 아이디 : user01
 		// 나이 : 25세
 		
-		
+		 
 	}
 	
 	// 회원 정보 수정 기능
