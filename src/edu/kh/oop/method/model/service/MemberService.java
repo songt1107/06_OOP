@@ -10,6 +10,7 @@ public class MemberService {
 	private Scanner sc = new Scanner(System.in);
 	
 	private Member memberInfo = null; // 가입한 회원의 정보를 저장할 변수
+	private Member loginMember = null; // 로그인한 회원의 정보를 저장할 변수
 	
 	// 기능(생성자,메서드)
 	
@@ -35,9 +36,20 @@ public class MemberService {
 			
 			switch(menuNum) {
 			case 1 : System.out.println(signUp()); break;
-			case 2 : System.out.println("로그인"); break;
-			case 3 : System.out.println("회원 정보 조회"); break;
-			case 4 : System.out.println("회원 정보 수정"); break;
+			case 2 : System.out.println(login()); break;
+			case 3 : System.out.println(selectMember()); break;
+			case 4 : 
+				int result = updateMember();
+				
+				if(result == -1) {
+					System.out.println("로그인 후 이용해주세요.");
+				} else if(result == 0) {
+					System.out.println("회원 정보 수정 실패 (비밀번호 불일치)");	
+				} else { // result == 1
+					System.out.println("회원 정보가 수정되었습니다.");
+				}
+				
+				break;
 			case 0 : System.out.println("프로그램 종료"); break;
 			default : System.out.println("잘못 입력하셨습니다.. 다시 입력해주세요");
 			
@@ -76,8 +88,17 @@ public class MemberService {
 			
 			// 입력받은 정보를 이용해서 Member 객체 생성한 후
 			// 생성된 객체의 주소를 필드에 있는 memberInfo에 대입
+			memberInfo = new Member(memberId, memberPw, memberName, memberAge);
+			
 			
 			return "회원가입 성공!!";
+			/* 출력 구문 메소드를 호출한 곳에서 한 번만 쓰고,
+			 * return을 이용해 전달할 값을 작성
+			 * */
+			
+			// return : 현재 메소드를 종료하고 호출한 곳으로 돌아감
+			// return 값; : 호출한 곳으로 돌아갈 때 값을 가지고 감. 
+			
 			
 		} else { // 일치하지 않는 경우
 			
@@ -85,6 +106,114 @@ public class MemberService {
 			
 		}
 		
+		
+	}
+	
+	// 로그인 메서드
+	public String login() {
+		
+		System.out.println("\n********로그인********");
+		
+		// 회원가입을 했는지 부터 확인
+		// == memberInfo가 객체를 참조하고 있는지 확인
+		
+		if (memberInfo == null) { // 회원가입을 먼저 안한 경우
+			// null : 아무것도 참조하고 있지 않음
+			return "회원 가입부터 진행 해주세요.";
+		} 
+		
+		System.out.println("아이디 입력 : ");
+		String memberId = sc.next();
+		
+		System.out.println("비밀번호 입력 : ");
+		String memberPw = sc.next();
+		
+		// 회원 가입 정보(memberInfo가 참조하는 Member 객체)에서
+		// 저장된 아이디, 비밀번호가
+		// 입력된 아이디, 비밀번호와 같으면 "로그인 성공"
+		// 아니면 "아이디 또는 비밀번호가 일치하지 않습니다"
+		
+		// 아이디, 비밀번호가 모두 일치할 경우
+		if (memberId.equals(memberInfo.getMemberId()) && 
+				memberPw.equals(memberInfo.getMemberPw())) {
+			// 입력받은 memberId와
+			// memberInfo 필드에서 참조중인 Member객체의 memberId가 같은지 확인
+			loginMember = memberInfo;
+			//  참조형   = Member객체 주소 (얕은 복사)
+			
+			// 회원가입정보를 loginMember에 대입하여
+			// 어떤 회원이 로그인 했는지를 구분할 수 있게 함.
+			
+			return loginMember.getMemberName() + "님 환영합니다.";
+		} else {
+			return "아이디 또는 비밀번호가 일치하지 않습니다.";
+		}
+		
+	}
+	
+	// 회원 정보 조회 기능
+	public String selectMember() {
+		
+		System.out.println("\n***** 회원 정보 조회*****");
+		
+		// 1) 로그인 여부 확인
+		if (loginMember != null) { // loginMember가 참조하는 객체가 있을 경우
+			return ("\n이름 : " + loginMember.getMemberName()
+			  + "\n아이디 : " + loginMember.getMemberId()
+			 + "\n나이 : " + loginMember.getMemberAge() + "세");
+		} else { // loginMember가 참조하는 객체가 없을 경우
+			return "로그인 후 이용해주세요";
+		}
+		// 로그인 안했을 때 "로그인 후 이용해주세요"
+		
+		// 2) 로그인이 되어있는 경우
+		// 회원 정보를 출력할 문자열을 만들어서 반환(return)
+		// 단, 비밀번호는 제외
+		
+		// 이름 : 홍길동
+		// 아이디 : user01
+		// 나이 : 25세
+		
+		
+	}
+	
+	// 회원 정보 수정 기능
+	public int updateMember() {
+		
+		System.out.println("\n****** 회원정보 수정 ******");
+		
+		// 1) 로그인 여부 판별
+		// 로그인이 되어있지 않으면 -1 반환
+		if (loginMember == null) {
+			return -1;
+		}
+		
+		// 2) 로그인이 되어있을 때
+		// 2-1) 수정할 회원 정보 입력 받기 (이름,나이)
+		System.out.println("이름 : ");
+		String inputName = sc.next();
+		System.out.println("나이 : ");
+		int inputAge = sc.nextInt();
+		
+		
+		// 2-2) 비밀번호를 입력받아서 로그인한 회원의 비밀번호와 일치하는지 확인
+		// -> 비밀번호가 같을 경우
+		System.out.print("비밀번호 입력 : ");
+		String inputPw = sc.next();
+		
+		if (inputPw.equals(loginMember.getMemberPw())) {
+				loginMember.setMemberName( inputName );
+				loginMember.setMemberAge( inputAge );
+			return 1;
+		} else {
+			return 0;
+		}
+		
+		// 		로그인한 회원의 이름, 나이 정보를 입력받은 값으로 변경 후
+		// 		1 반환
+		
+		
+		// -> 비밀번호가 다를 경우 0 반환
 		
 	}
 	

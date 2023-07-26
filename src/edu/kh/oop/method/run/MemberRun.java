@@ -19,6 +19,9 @@ public class MemberRun {
 		
 		service.displayMenu(); // 메서드 호출
 		service.signUp();
+		service.login();
+		service.selectMember();
+		service.updateMember();
 		
 	}
 }
